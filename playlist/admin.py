@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Music,Artist,Genre,Language,PlayListTrack,Playlist
+from .models import Music,Artist,Genre,Language,PlayListTrack,Playlist,UserPrefrence
+
 # Register your models here.
 @admin.register(Music)
 class MusicAdmin(admin.ModelAdmin):
@@ -17,5 +18,6 @@ class GenreAdmin(admin.ModelAdmin):
 admin.site.register(Language)
 admin.site.register(PlayListTrack)
 admin.site.register(Playlist)
+admin.site.register(UserPrefrence)
 
 

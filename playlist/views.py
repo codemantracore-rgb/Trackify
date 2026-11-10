@@ -10,7 +10,7 @@ from rest_framework import status
 from .permissions import IsPlayListOwner
 
 from .permissions import MusicPermission
-from .serializers import MusicSerializer,PlayListSerializer,AddMusicSerializer
+from .serializers import MusicSerializer,PlayListSerializer,AddMusicSerializer,UserPrefrenceSerializer
 from .models import Music,Playlist,PlayListTrack
 from django.contrib.auth.models import User
 
@@ -86,6 +86,12 @@ class DeleteMusicView(DestroyAPIView):
     def perform_destroy(self, instance):
         instance.delete()
 
+class UserPrefrenceView(CreateAPIView):
+    permission_classes=[IsAuthenticated]
+    serializer_class=UserPrefrenceSerializer
+    def perform_create(self,serializer):
+        serializer.save(user=self.request.user)
+    
 # from rest_framework.generics import GenericAPIView
 # from rest_framework.mixins import (
 #     ListModelMixin,

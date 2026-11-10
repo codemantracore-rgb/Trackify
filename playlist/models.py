@@ -106,7 +106,7 @@ from django.conf import settings
 class UserPrefrence(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     music=models.ForeignKey(Music,on_delete=models.CASCADE)
-    listened_duration=models.BooleanField()
+    listened_duration=models.PositiveIntegerField()
     completed=models.BooleanField()
     skipped=models.BooleanField()
     liked=models.BooleanField()

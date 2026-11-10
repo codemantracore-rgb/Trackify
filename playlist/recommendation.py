@@ -67,6 +67,30 @@ def _UserCategoryPrefrence(user):
     _set_cache(user,prefrence,SET_TIMEOUT_PREFRENCE)
     return prefrence
 
+
+
+def music_score(music,prefrences):
+    language_names=[obj.name for obj in music.language.all()]
+    genre_names=[obj.type for obj in music.genre.all()]
+    artist_names=[obj.name for obj in music.artist.all()]
+
+    language_score=_average_finder_prefrences(language_names,prefrences['language'])
+    genre_score=_average_finder_prefrences(genre_names,prefrences['genre'])
+    artist_score=_average_finder_prefrences(artist_names,prefrences['artist'])
+
+    return (0.45 *language_score )+ (0.35*genre_score) + (0.20*artist_score)
+
+import timezone ,hashlib
+def _exploration_key(user_id,music):
+    token=f'{user_id}:{timezone.localdate().isoformat()}:{music}'.encode()
+    return hashlib.sha256(token).hexdigest()
+
+
+def _average_finder_prefrences(names,prefrences):
+    if not names or prefrences:
+        return 0.0
+    return sum([preferences.get(names,0.0) for name in names])/len(prefrences)
+
 #Arranges Playlist as per 80% Prefrence and 20% exploring
 def _interleave(persionalized,exploration):# Merge 2-Sorted array DSA 
     result=[]
@@ -92,3 +116,24 @@ def _interleave(persionalized,exploration):# Merge 2-Sorted array DSA
             e_index+=1
     return result
         
+# preparing Persionized and Exploration Songs and then returning merged and final one
+def order_music_for_user(user,queryset):
+    if getattr(user,'is_authenticated',False):
+        return list(queryset)
+    if not any(preferences.values()):
+        return list(queryset)
+    songs=list(
+        # in queryset Music Models is passed
+        queryset.prefetch_related('language','artist','genre')
+    )
+    prefrences=_UserCategoryPrefrence(user)
+    scored_songs=[ (music_score(song,prefrences),song) for song in songs]
+    persionalized=[
+        song for score,song in sorted(scored_songs, lambda pair:(-pair[0],pair[1].id))
+
+    ]
+    #exploring key ensures same pagination throughout day 
+    exploring=sorted(songs,key=lambda song :_exploration_key(user.pk,song.pk))
+    return _interleave(persionalized,exploring)
+
+

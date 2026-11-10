@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import MusicView, PlaylistView,AddMusicView,DeleteMusicView
+from .views import MusicView, PlaylistView,AddMusicView,DeleteMusicView,UserPrefrenceView
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -9,7 +9,8 @@ urlpatterns = [
     path('', MusicView.as_view(), name='music'),
     path('', include(router.urls)),
     path('add-music',AddMusicView.as_view(),name='add-music'),
-    path('delete-music',DeleteMusicView.as_view(),name='delete-music')
+    path('delete-music',DeleteMusicView.as_view(),name='delete-music'),
+    path('listening-history',UserPrefrenceView.as_view(),name='listening-history')
 ]
 # URL
 
