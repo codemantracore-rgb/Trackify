@@ -13,6 +13,7 @@ from .permissions import MusicPermission
 from .serializers import MusicSerializer,PlayListSerializer,AddMusicSerializer,UserPrefrenceSerializer
 from .models import Music,Playlist,PlayListTrack
 from django.contrib.auth.models import User
+from.recommendation import order_music_for_user
 
 class MusicView(GenericAPIView):
     queryset=Music.objects.all().order_by('id')
@@ -20,8 +21,12 @@ class MusicView(GenericAPIView):
     permission_classes=[MusicPermission]
 
     def get(self,request,*args,**kwargs):
-        music=self.paginate_queryset(self.queryset)
-        serializer=self.get_serializer(music,many=True)
+        # music=self.paginate_queryset(self.queryset)
+        # serializer=self.get_serializer(music,many=True)
+        # return self.get_paginated_response(serializer.data)
+        ordered_music = order_music_for_user(request.user, self.get_queryset())
+        page = self.paginate_queryset(ordered_music)
+        serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
     def post(self,request,*args,**kwargs):

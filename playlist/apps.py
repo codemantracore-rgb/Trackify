@@ -5,5 +5,5 @@ class PlaylistConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "playlist"
     
-def ready(self):
-    from . import signals
+    def ready(self):
+        from . import signals
