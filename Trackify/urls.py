@@ -25,6 +25,7 @@ urlpatterns = [
     path('music/',include('playlist.urls')),
     path('access/',TokenObtainPairView.as_view(),name='access'),
     path('refresh/',TokenRefreshView.as_view(),name='refresh'),
-     path('users/',include('users.urls'),name='users')
+     path('users/',include('users.urls'),name='users'),
+    
 
 ]

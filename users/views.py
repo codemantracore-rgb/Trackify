@@ -66,6 +66,41 @@ class LogoutView(APIView):
         except:
             return Response({'message':"Enter valid Token"},status=status.HTTP_400_BAD_GATEWAY)
 
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from .models import Artist,User,Follow
+from django.shortcuts import get_object_or_404
+# Logics for Following and Unfollowing Artists
+
+@login_required
+@require_POST
+def follow(request,artist_id):
+    # artist=Artist.objects.get(id=artist_id)
+    artist=get_object_or_404(Artist,id=artist_id)
+    user=request.user
+    follow,created=Follow.objects.get_or_create({'artist':artist,'listener':user})
+    return JsonResponse({'message':'Followed'})
+
+from rest_framework import status
+@login_required
+@require_POST
+def unfollow(request,artist_id):
+    if request.user.role!='Listener':
+        return JsonRequest({'message':'you are not Listener'},status=status.HTTP_401_UNAUTHORIZED)
+    artist=get_object_or_404(
+        ArtistProfile,
+        id=artist_id
+    )
+    delete_count,_=Follow.objects.get(user=request.user,artist=artist).delete()
+    return JsonResponse({'message':'Unfollowed Sucesfully'})
+
+
+
+
+
+
+
 
 
 

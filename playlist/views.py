@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny,IsAdminUser,IsAuthenticated
 from django.views import View
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 from .permissions import IsPlayListOwner
 
 from .permissions import MusicPermission
@@ -19,6 +20,19 @@ class MusicView(GenericAPIView):
     queryset=Music.objects.all().order_by('id')
     serializer_class=MusicSerializer
     permission_classes=[MusicPermission]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get('search', '').strip()
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search)
+                | Q(description__icontains=search)
+                | Q(artist__name__icontains=search)
+                | Q(genre__type__icontains=search)
+                | Q(language__name__icontains=search)
+            ).distinct()
+        return queryset
 
     def get(self,request,*args,**kwargs):
         # music=self.paginate_queryset(self.queryset)
@@ -140,6 +154,5 @@ class UserPrefrenceView(CreateAPIView):
 
 
             
-
 
 
